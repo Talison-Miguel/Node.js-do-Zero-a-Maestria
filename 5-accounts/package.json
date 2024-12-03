@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "5-accounts": "file:",
     "chalk": "^4.1.2",
     "inquirer": "^12.1.0"
   }
