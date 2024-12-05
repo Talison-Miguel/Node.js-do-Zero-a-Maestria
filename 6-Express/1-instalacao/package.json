@@ -1,5 +1,5 @@
 {
-  "name": "4-http-url",
+  "name": "1-instalacao",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "4-http-url": "file:"
+    "1-instalacao": "file:",
+    "express": "^4.21.1"
   }
 }
