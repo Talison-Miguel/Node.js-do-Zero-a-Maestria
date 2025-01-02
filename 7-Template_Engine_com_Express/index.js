@@ -7,7 +7,20 @@ app.engine('handlebars', exphbs.engine())
 app.set('view engine', 'handlebars')
 
 app.get('/dashboard', (req, res) => {
-    res.render('dashboard')
+
+    const items = ["item a", "item b", "item c"]
+    
+    res.render('dashboard', {items})
+})
+
+app.get('/post', (req, res) => {
+    const post = {
+        title: 'Titulo Node',
+        category: 'JS',
+        body: 'Descrição do artigo'
+    }
+
+    res.render('blogpost', { post })
 })
 
 app.get('/', (req, res) => {
