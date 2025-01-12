@@ -62,3 +62,17 @@ form, .books-container {
 .text-book {
     text-align: center;
 }
+
+#edit {
+    text-align: center;
+    margin-top: 1em;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+}
+
+.actions a {
+    margin-right: 1em;
+}
