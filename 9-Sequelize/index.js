@@ -2,6 +2,7 @@ const express = require('express');
 const { engine } = require('express-handlebars'); 
 const conn = require('./db/conn');
 const User = require('./models/User');
+const Adress = require('./models/Adress');
 
 const app = express();
 
@@ -10,7 +11,6 @@ app.use(express.urlencoded({ extended: true })); // Para lidar com dados de form
 app.use(express.json()); // Para processar JSON
 app.use(express.static('public')); // Servir arquivos estáticos
 
-// Configuração do Handlebars
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', './views'); 
@@ -30,10 +30,54 @@ app.get('/users/:id', async (req, res) => {
 app.get('/users/edit/:id', async (req, res) => {
     const id = req.params.id;
 
-    const user = await User.findOne({raw: true, where: {id: id}})
+    try {
+        const user = await User.findOne({include: Adress, where: {id: id}})
+        
+        res.render('useredit', {user: user.get({ plain: true})})
+    } catch(err) {
+        console.log(err)
+    }
 
-    res.render('useredit', {user})
 })
+
+app.post('/address', async (req, res) => {
+    try {
+        const { street, number, city, userId } = req.body
+
+        // Verifica se o usuário existe
+        const user = await User.findByPk(userId)
+        if (!user) {
+            return res.status(404).json({ message: 'Usuário não encontrado' })
+        }
+
+        // Cria o endereço vinculado ao usuário
+        const address = await Adress.create({ street, number, city, UserId: userId })
+
+        return res.status(201).json(address)
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
+})
+
+app.delete('/address/delete/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Verifica se o endereço existe
+        const address = await Adress.findByPk(id);
+        if (!address) {
+            return res.status(404).json({ message: 'Endereço não encontrado' });
+        }
+
+        // Deleta o endereço
+        await address.destroy();
+
+        return res.status(200).json({ message: 'Endereço deletado com sucesso' });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
 
 app.get('/users/delete/:id', async (req, res) => {
     const id = req.params.id;
@@ -46,10 +90,22 @@ app.get('/users/delete/:id', async (req, res) => {
 app.get('/api/users/:id', async (req, res) => {
     const id = req.params.id;
 
-    const user = await User.findOne({raw: true, where: {id: id}})
+    try {
+        const user = await User.findOne({
+            where: { id: id },
+            include: [{ model: Adress }] 
+        });
 
-    res.status(200).json(user);
-})
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao buscar usuário", error: error.message });
+    }
+});
+
 
 app.delete('/api/users/:id', async (req, res) => {
     const id = req.params.id;
@@ -95,7 +151,9 @@ app.post('/users/create', async (req, res) => {
 // API: Obter todos os usuários
 app.get('/api/users', async (req, res) => {
     try {
-        const users = await User.findAll();
+        const users = await User.findAll({
+            include: [{ model: Adress }]
+        });
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao buscar usuários.', details: error.message });
