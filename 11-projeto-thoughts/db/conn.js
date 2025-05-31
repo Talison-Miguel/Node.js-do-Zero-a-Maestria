@@ -7,7 +7,7 @@ const sequelize = new Sequelize('projetoCursoNode', 'root', '', {
 
 try {
     sequelize.authenticate()
-    console.log('Conectado em: localhost://3000')
+    console.log('Conectado em: localhost:3000')
 } catch(err) {
     console.log(err)
 }
