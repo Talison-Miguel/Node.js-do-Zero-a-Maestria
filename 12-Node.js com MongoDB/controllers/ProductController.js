@@ -51,7 +51,6 @@ module.exports = class ProductController {
 
     static async editProductPost(req, res) {
         const { _id, name, price, description, image } = req.body
-        console.log('req.body:', req.body);
 
         const product = new Product(name, price, description, image);
         product._id = _id
